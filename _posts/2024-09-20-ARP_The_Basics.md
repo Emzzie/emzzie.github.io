@@ -1,8 +1,6 @@
 ---
 title: ARP - The basics
 description: Lets have a look at the basics of ARP 
-author: Emzzie
-date:  2024-09-19 10:00 +0800
 categories: [Basics, Protocols]
 tags: [Basics, Protocols]
 pin: false
@@ -16,10 +14,10 @@ All devices capable of connecting to the internet will have a Network Interface 
 ## IP Addresses
 IP Addresses is what is used to identify hosts over the internet. All hosts connected to the internet have an IP address. These addresses are used by the Network Layer (Layer 3) of the [OSI model]({% post_url 2024-09-19-OSI_Model_Basics %}) and deals (mostly) indirectly with connected devices. The IP addresses of a device can vary but the MAC-address can't. 
 
-You can deep dive into the vast world of IP and subnetting here ** ADD LINK**.
+You can deep dive into the vast world of IP and subnets here **ADD LINK**.
 
 ## Why do we need both IP Addresses and Mac Addresses?
-Note that the addresses are used by different layers. In essence, the data link layer devices doesn't _really_ care which protocol is used on the Network layer, it could be IPv4, IPv6 or IPX. Layer two devices like switches only focus on MAC addresses while layer three devices like routers will look for the IP addresses. So, basically the way Internet works makes it neccessary to have both addresses. I warmly recommend [this](https://ine.com/blog/why-do-we-need-both-ip-addresses-and-mac-addresses) blog post if you want to read more on this!
+Note that the addresses are used by different layers. In essence, the data link layer devices doesn't _really_ care which protocol is used on the Network layer, it could be IPv4, IPv6 or IPX. Layer two devices like switches only focus on MAC addresses while layer three devices like routers will look for the IP addresses. So, basically the way Internet works makes it necessary to have both addresses. I warmly recommend [this](https://ine.com/blog/why-do-we-need-both-ip-addresses-and-mac-addresses) blog post if you want to read more on this!
 
 ## ARP and The Subnet
 Recall how the entire internet is made up from subnets. You probably have WiFi setup at home, with lots of things connected to it, like computers, phones, TVs and other things. These are all part of a subnet that is (hopefully) only accessed by you and your household. The WiFi router is your path to the vast internet. What on earth does this have to do with ARP? Well, any time you want to send or receive IP-packets, wether it is to connect to a website or to turn on your smart tv via your phone, you need to know which device that should receive the packet. You will already have the IP-address one way or another (more on this later), but what is the MAC-address to send this data to? This is where ARP comes in. 
@@ -33,7 +31,7 @@ Let's say you want to browse to Google.com. First off, your computer needs to re
 
 The next step is to figure out if that IP address is within your subnet or not. In this case it isn't, so the request needs to be sent to your default gateway (usually your wifi router), this will be 192.168.0.1, 192.168.1.1 or 192.168.254. 
 
-Your computer now takes a look at what is called a __ARP table__ (or ARP Chache) to figure out if it has the MAC-address of the router already stored.
+Your computer now takes a look at what is called a __ARP table__ (or ARP Cache) to figure out if it has the MAC-address of the router already stored.
 
 Let's assume that your device does't know the MAC address of your router. It will then send an __ARP Request__ to all devices the subnet. This is the way the computer asks "Hey, I want to send data to the device associated with this IP address, what's your MAC-address?". The device that has the IP address will respond to the request with its MAC-address. 
 
@@ -49,11 +47,11 @@ Once the ARP reply is received at your computer the MAC address is then stored i
 ## Key Takeaways
 
 * __IP to MAC Mapping:__ ARP is used to map IP addresses to a MAC address within a _local_ network. 
-* __ARP Requests and Replies:__ When a device needs to communicate to another device on the same network but doesn't know it's MAC address, it sends an __ARP request__. The device with the matchin IP address responds with an __ARP reply__ and provides his MAC address.
+* __ARP Requests and Replies:__ When a device needs to communicate to another device on the same network but doesn't know it's MAC address, it sends an __ARP request__. The device with the matching IP address responds with an __ARP reply__ and provides his MAC address.
 * __ARP Table:__ The devices maintain an ARP table (or cache) to speed up future communications by reducing the number of ARP requests.
 
 ## Dive Deeper 
-I strongly recommend having a look at the room [Nmap Live Host Discovery](https://tryhackme.com/r/room/nmap01), in task 2 you can play around with ARP requests along with a few other packets. It's free for all, so just create an account and get testing! I have provided a writeup for this room [here]({%post_url 2024-09-19-THM_LiveHostDiscovery %} )
+I strongly recommend having a look at the room [Nmap Live Host Discovery](https://tryhackme.com/r/room/nmap01), in task 2 you can play around with ARP requests along with a few other packets. It's free for all, so just create an account and get testing! I have provided a writeup for this room [here]({% post_url 2024-09-24-THM_LiveHostDiscovery %})
 
 Jeremy's IT lab has a very good video on ARP, check it out [here](https://www.youtube.com/watch?v=k3oda32jmWY)
 
