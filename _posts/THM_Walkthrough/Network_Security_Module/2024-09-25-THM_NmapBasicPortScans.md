@@ -13,7 +13,7 @@ This is the second room in the Nmap series on TryHackMe.
 
 ## Task 1: Introduction
 
-In the previous room, [Live Host Discovery]({% post_url 2024-09-24-THM_LiveHostDiscovery%}), the main focus was on finding the online systems. This room will focus on the next step, when we want to check the ports on a live target.
+In the previous room, [Live Host Discovery]({% post_url THM_Walkthrough/Network_Security_Module/2024-09-24-THM_LiveHostDiscovery%}), the main focus was on finding the online systems. This room will focus on the next step, when we want to check the ports on a live target.
 
 This room will cover:
 1. TCP connect port scan

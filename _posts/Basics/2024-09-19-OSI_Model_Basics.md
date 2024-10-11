@@ -7,15 +7,14 @@ categories: [Basics]
 tags: [Basics, OSI]
 pin: false
 ---
+This is a VERY quick overview of the OSI (**O**pen **S**ystem **I**nterconnection) Model, a well known way of breaking down the computer networking into seven layers.    
 
-The OSI (**O**pen **S**ystem **I**nterconnection) Model is a well known way of breaking down the computer networking into sevel layers.    
-
-For the visual lerners out there [here](https://www.youtube.com/watch?v=KHMwhjQrCmo) is an awesome three minute explanation.
+For the visual learners out there [here](https://www.youtube.com/watch?v=KHMwhjQrCmo) is an awesome three minute explanation.
 
 Otherwise lets get to it!  
 
 ## Layer 1  (The Physical Layer): 
-Specifies how the physical communication will take place, which cables are used if any, which voltages etc. \
+Specifies how the physical communication will take place, which cables are used if any, which voltages etc. 
 
 ## Layer 2 (The Data Link Layer): 
 This layer handles the node-to-node transfer. There are two layers here, the Media Access Control (MAC) and the Logical Link Control (LLC).    

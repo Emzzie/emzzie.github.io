@@ -12,7 +12,7 @@ Welcome to this walkthrough of the room "Nmap Advanced Port Scans"!
 This is the third room in the Nmap series on TryHackMe. 
 
 ## Task 1: Introduction
-In the first room of the series,[Live Host Discovery]({% post_url 2024-09-24-THM_LiveHostDiscovery%}), you learned all about host discovery. Then you explored the basic scans used by Nmap in [Basic Port Scans]({% post_url 2024-09-25-THM_NmapBasicPortScans%}). Now it's time to briefly discover a few of the more advanced scans along with spoofing IP and MAC, Decoy Scans, fragmented packets and Zombie Scan. 
+In the first room of the series,[Live Host Discovery]({% post_url THM_Walkthrough/Network_Security_Module/2024-09-24-THM_LiveHostDiscovery%}), you learned all about host discovery. Then you explored the basic scans used by Nmap in [Basic Port Scans]({% post_url THM_Walkthrough/Network_Security_Module/2024-09-25-THM_NmapBasicPortScans%}). Now it's time to briefly discover a few of the more advanced scans along with spoofing IP and MAC, Decoy Scans, fragmented packets and Zombie Scan. 
 
 ## Task 2: TCP Null Scan, FIN Scan and Xmas Scan
 On the man pages of port scanning on [Nmap](https://nmap.org/book/man-port-scanning-techniques.html) you will find the following on these three scans:

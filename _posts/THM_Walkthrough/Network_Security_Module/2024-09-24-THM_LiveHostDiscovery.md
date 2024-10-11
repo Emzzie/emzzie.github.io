@@ -12,10 +12,10 @@ Welcome to this walkthrough of the room "Nmap Live Host Discovery"!
 
 This is the first room in the Nmap series on TryHackMe.
 
-I strongly recommend getting the basics refreshed before starting this room. Unless you feel that you got the the nitty gritty of ARP, ICMP, TCP/UDP and the OSI model straightened out, either have a look at **ADD ROOMS** or quickly have a look at 
-* [Another OSI Model Breakdown]({% post_url 2024-09-19-OSI_Model_Basics %}).
-* [ARP The Basics]({% post_url 2024-09-20-ARP_The_Basics%}).
-* [ICMP - The Two Edged Sword]({% post_url 2024-09-23-ICMP_The_Two_Edged_Sword %}). 
+I strongly recommend getting the basics refreshed before starting this room. Unless you feel that you got the the nitty gritty of ARP, ICMP, TCP/UDP and the basics of the OSI model straightened out, either have a look at **ADD ROOMS** or quickly have a look at 
+* [Another OSI Model Breakdown]({% post_url Basics/2024-09-19-OSI_Model_Basics %}).
+* [ARP The Basics]({% post_url Basics/2024-09-20-ARP_The_Basics%}).
+* [ICMP - The Two Edged Sword]({% post_url Basics/2024-09-23-ICMP_The_Two_Edged_Sword %}). 
 
 Note that I won't do a copy-paste from TryHackMe. You can read that yourself, I will provide my own take on the information given and guide you to the correct answers in my own words. 
 
@@ -221,7 +221,7 @@ There are a few messages that are part of the ICMP protocol the ones that are im
 * Timestamp
 * Address Mask Request
 
-Echo Request/Reply and Timestamp are shortly covered in [ICMP - The Two Edged Sword]({% post_url 2024-09-23-ICMP_The_Two_Edged_Sword %}).
+Echo Request/Reply and Timestamp are shortly covered in [ICMP - The Two Edged Sword]({% post_url Basics/2024-09-23-ICMP_The_Two_Edged_Sword %}).
 
 
 If you want to use the _ICMP Echo request_ to discover the live hosts you add the `-PE` flag. Note that the ICMP Echo request is sent as an IP packet, and in order to know where to send the IP packets an ARP request is sent in order to know the destination device. So if you scan a local subnet with ICMP Echo request, these packets don't need to be sent since Nmap can confirm that the hosts are up based on the ARP responses.
