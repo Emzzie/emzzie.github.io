@@ -1,1 +1,2 @@
-[theme repository][chirpy] to provide feedback.
+Jekyll theme: Chirpy
+
