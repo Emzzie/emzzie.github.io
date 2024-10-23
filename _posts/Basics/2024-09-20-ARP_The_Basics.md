@@ -14,7 +14,7 @@ All devices capable of connecting to a network (not necessarily the internet) ha
 ## IP Addresses
 IP Addresses is what is used to identify hosts over the internet. All hosts connected to the internet have an IP address. These addresses are used by the Network Layer (Layer 3) of the [OSI model]({% post_url Basics/2024-09-19-OSI_Model_Basics %}) and deals (mostly) indirectly with connected devices. In a local network the IP addresses of a device can vary but the MAC-address can't (except through spoofing). 
 
-You can deep dive into the vast world of IP and subnets [here](https:https://www.youtube.com/playlist?list=PLIhvC56v63IKrRHh3gvZZBAGvsvOhwrRF).
+You can deep dive into the vast world of IP and subnets [here](https://www.youtube.com/playlist?list=PLIhvC56v63IKrRHh3gvZZBAGvsvOhwrRF).
 
 ## Why do we need both IP Addresses and Mac Addresses?
 Note that the addresses are used by different layers. The data link layer (Layer 2) doesn't really care what happens on the network layer (Layer 3). This means it doesn’t care if you’re using IPv4, IPv6, or even another protocol. Layer 2 handles devices using their MAC addresses, while Layer 3 handles routing traffic using IP addresses. So, basically the way Internet works makes it necessary to have both addresses. I warmly recommend [this](https://ine.com/blog/why-do-we-need-both-ip-addresses-and-mac-addresses) blog post if you want to read more on this!
