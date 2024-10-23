@@ -14,7 +14,7 @@ All devices capable of connecting to a network (not necessarily the internet) ha
 ## IP Addresses
 IP Addresses is what is used to identify hosts over the internet. All hosts connected to the internet have an IP address. These addresses are used by the Network Layer (Layer 3) of the [OSI model]({% post_url Basics/2024-09-19-OSI_Model_Basics %}) and deals (mostly) indirectly with connected devices. In a local network the IP addresses of a device can vary but the MAC-address can't (except through spoofing). 
 
-You can deep dive into the vast world of IP and subnets here **ADD LINK**.
+You can deep dive into the vast world of IP and subnets [here](https:https://www.youtube.com/playlist?list=PLIhvC56v63IKrRHh3gvZZBAGvsvOhwrRF).
 
 ## Why do we need both IP Addresses and Mac Addresses?
 Note that the addresses are used by different layers. The data link layer (Layer 2) doesn't really care what happens on the network layer (Layer 3). This means it doesn’t care if you’re using IPv4, IPv6, or even another protocol. Layer 2 handles devices using their MAC addresses, while Layer 3 handles routing traffic using IP addresses. So, basically the way Internet works makes it necessary to have both addresses. I warmly recommend [this](https://ine.com/blog/why-do-we-need-both-ip-addresses-and-mac-addresses) blog post if you want to read more on this!
@@ -33,7 +33,7 @@ Let's say you want to browse to Google.com. First off, your computer needs to re
 
 The next step is to figure out if that IP address is within your subnet or not. In this case it isn't, so the request needs to be sent to your default gateway (usually your wifi router), this will be 192.168.0.1, 192.168.1.1 or 192.168.254. Once your computer knows the IP address of Google, it still needs to find a way to send packets to that address within the local network — this is where ARP comes in.
 
-Your computer now takes a look at what is called a __ARP table__ (or ARP Cache) to figure out if it has the MAC-address of the router already stored.
+Your computer now takes a look at what is called an __ARP table__ (or ARP Cache) to figure out if it has the MAC-address of the router already stored.
 
 Let's assume that your device doesn't know the MAC address of your router. It will then send an __ARP Request__ to all devices the subnet. This is the way the computer asks "Hey, I want to send data to the device associated with this IP address, what's your MAC-address?". The device that has the IP address will respond to the request with its MAC-address. 
 

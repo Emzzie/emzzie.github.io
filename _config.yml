@@ -16,7 +16,7 @@ timezone: Europe/Stockholm
 
 title: The CyberSec journey # the main title
 
-tagline: "Every breach tells a story; it’s our job to read between the lines and learn from the past." #"Why did the cybersecurity newbie bring a ladder to work? To stay one step ahead of the threats!" # it will display as the subtitle
+tagline: "Exploring the fascinating, ever-evolving world of cybersecurity while emphasizing the importance of mastering the basics. Join me as I break down complex concepts and share my learning journey." #"Why did the # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
 
@@ -34,7 +34,7 @@ social:
   name: emzzie
   links:
     # The first element serves as the copyright owner's link
-    - https://twitter.com/username # change to your Twitter homepage
+    # https://twitter.com/username # change to your Twitter homepage
     - https://github.com/emzzie # change to your GitHub homepage
     # Uncomment below to add more social links
     # - https://www.facebook.com/username

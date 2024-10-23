@@ -29,7 +29,9 @@ These messages inform a source node about issues preventing the delivery of pack
 ## ICMP in Action
 We already established that ICMP is used for error reporting and diagnostics within a network. Let's explore this with a couple of examples.
 
-Let's say that PC1 wants to send a packet to PC2 in the image below. First the packet reaches router 1. Which finds a matching route and forwards the packet to router 2. Router 2, however, cannot find a route for the packet and therefore drops it. It then sends a _ICMP Destination Unreachable_ message to PC1. **Image**
+Let's say that PC1 wants to send a packet to PC2 in the image below. First the packet reaches router 1. Which finds a matching route and forwards the packet to router 2. Router 2, however, cannot find a route for the packet and therefore drops it. It then sends a _ICMP Destination Unreachable_ message to PC1. **IMAGE**
+
+
 
 In a similar manner, if the TTL expires, at Router 2 and the packet is destined for PC2, then Router 2 will return a _ICMP Time Exceeded_ message.
 

